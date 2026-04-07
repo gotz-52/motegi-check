@@ -1,6 +1,6 @@
 import requests
 
-WEBHOOK_URL = "https://discord.com/api/webhooks/1490931945570566174/OsKTPlbCpCZ28VDvxErtx5O9qEgI2txN2b568JsFBfrPfuuyX2FWyjVeQPHVUNfeBQL2"
+WEBHOOK_URL = "ここにWebhook"
 
 URLS = {
     "Marriott": "https://www.marriott.com/search/findHotels.mi?destinationAddress.city=Motegi&checkInDate=2026-10-02&checkOutDate=2026-10-04&rooms=1&adults=2",
@@ -22,8 +22,18 @@ def check():
             r = requests.get(url, headers=headers, timeout=10)
             text = r.text
 
-            if "¥" in text or "空室" in text:
-                notify(f"🔥{name} 空室の可能性！\n{url}")
+            # ===== ここが重要（インデント） =====
+            if name == "Marriott":
+                if "¥" in text or "JPY" in text:
+                    notify(f"🔥Marriott 空室！\n{url}")
+
+            elif name == "楽天":
+                if "フェアフィールド" in text and "もてぎ" in text and ("空室" in text):
+                    notify(f"🔥楽天 本命ホテル空室！\n{url}")
+
+            elif name == "じゃらん":
+                if "フェアフィールド" in text and "もてぎ" in text and ("空室" in text):
+                    notify(f"🔥じゃらん 本命ホテル空室！\n{url}")
 
         except:
             print(f"{name} エラー")
