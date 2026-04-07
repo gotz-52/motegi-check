@@ -23,3 +23,7 @@ jobs:
 
       - name: スクリプト実行
         run: python main.py
+        env:
+          WEBHOOK_URL: $
+       {{ secrets.WEBHOOK_URL }}
+      
