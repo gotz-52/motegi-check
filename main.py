@@ -40,4 +40,5 @@ def check():
             print(f"{name} エラー")
 
 if __name__ == "__main__":
+    notify("テスト通知")
     check()
