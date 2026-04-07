@@ -1,7 +1,7 @@
 import requests
 import os
 
-WEBHOOK_URL = os.gentenv("WEBHOOK_URL")
+WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
 URLS = {
     "Marriott": "https://www.marriott.com/search/findHotels.mi?destinationAddress.city=Motegi&checkInDate=2026-10-02&checkOutDate=2026-10-04&rooms=1&adults=2",
