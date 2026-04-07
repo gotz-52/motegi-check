@@ -36,8 +36,8 @@ def check():
                 if "フェアフィールド" in text and "もてぎ" in text and ("空室" in text):
                     notify(f"🔥じゃらん 本命ホテル空室！\n{url}")
 
-        except:
-            print(f"{name} エラー")
+        except Exception as e:
+            print(f"{name} エラー: {e}")
 
 if __name__ == "__main__":
     notify("テスト通知")
