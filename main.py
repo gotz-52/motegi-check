@@ -17,46 +17,35 @@ def notify(msg):
     else:
         print("⚠️ WEBHOOK_URLが設定されていません")
 
-# ===== Marriottチェック（料金タグで判定） =====
+# ===== 共通：ページ取得 =====
+def fetch(url):
+    headers = {"User-Agent": "Mozilla/5.0"}
+    r = requests.get(url, headers=headers, timeout=10)
+
+    print(f"[DEBUG] {url} status={r.status_code} size={len(r.text)}")
+
+    return r.text
+
+
+# ===== Marriott（軽修正版）=====
 def check_marriott(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    r = requests.get(url, headers=headers, timeout=10)
-    soup = BeautifulSoup(r.text, "html.parser")
+    text = fetch(url)
 
-    # ページに料金情報があるかチェック
-    # Marriottのページでは「JPY」や金額が含まれるspanタグなどを探す
-    if soup.find(string=lambda t: t and ("¥" in t or "JPY" in t)):
-        return True
-    return False
+    # 「料金・空室系キーワード」に寄せる（¥単体はやめる）
+    keywords = ["per night", "rate", "availability", "JPY", "¥"]
 
-# ===== 楽天・じゃらんチェック（空室タグで判定） =====
-def check_rakuten_jalan(url):
-    headers = {"User-Agent": "Mozilla/5.0"}
-    r = requests.get(url, headers=headers, timeout=10)
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    # 楽天・じゃらんの空室表示は「空室」や「宿泊可」が含まれる要素をチェック
-    availability_texts = soup.find_all(string=lambda t: t and ("空室" in t or "宿泊可" in t))
-    for t in availability_texts:
-        if "フェアフィールド" in t or "もてぎ" in t:
+    for k in keywords:
+        if k.lower() in text.lower():
             return True
+
     return False
 
-# ===== 全体チェック =====
-def check():
-    for name, url in URLS.items():
-        try:
-            available = False
-            if name == "Marriott":
-                available = check_marriott(url)
-            else:  # 楽天・じゃらん
-                available = check_rakuten_jalan(url)
 
-            if available:
-                notify(f"🔥{name} 空室！\n{url}")
-                print(f"{name} 空室通知送信")
-            else:
-                print(f"{name} 空室なし")
+# ===== 楽天・じゃらん（見逃し減らす版）=====
+def check_rakuten_jalan(url):
+    text = fetch(url)
 
-        except Exception as e:
-            print(f"{name} エラー: {e}")
+    # 明確な満室ワードだけ除外（＝無ければチャンス扱い）
+    deny_words = ["満室", "sold out", "予約できません", "空室なし"]
+
+    for w in deny_words:
