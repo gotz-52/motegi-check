@@ -60,8 +60,3 @@ def check():
 
         except Exception as e:
             print(f"{name} エラー: {e}")
-
-# ===== 実行 =====
-if __name__ == "__main__":
-    notify("✅ 通知テスト")  # 初回動作確認用
-    check()
